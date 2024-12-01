@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import 'JokeService.dart';
@@ -36,11 +38,16 @@ class _JokeListPageState extends State<JokeListPage>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
-  final Color primaryColor = const Color(0xFF7C4DFF);
-  final Color backgroundColor = const Color(0xFFF8F9FF);
-  final Color cardColor = Colors.white;
-  final Color textColor = const Color(0xFF2D3142);
-  final Color accentColor = const Color(0xFF4CAF50);
+  // Modern gradient colors
+  final Color gradientStart = const Color(0xFF6B8DE3);
+  final Color gradientMiddle = const Color(0xFF8B5CF6);
+  final Color gradientEnd = const Color(0xFFDB2777);
+
+  // Updated component colors
+  final Color primaryColor = const Color(0xFF8B5CF6);
+  final Color cardBackground = Colors.white.withOpacity(0.20);
+  final Color textColor = Colors.white;
+  final Color secondaryTextColor = Colors.white60;
 
   @override
   void initState() {
@@ -90,11 +97,12 @@ class _JokeListPageState extends State<JokeListPage>
           top: index == 0 ? 16 : 0,
         ),
         decoration: BoxDecoration(
-          color: cardColor,
+          color: cardBackground,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withOpacity(0.08),
+              color: Colors.black.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -102,78 +110,73 @@ class _JokeListPageState extends State<JokeListPage>
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: primaryColor,
-                  width: 4,
-                ),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        joke['category'],
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: primaryColor,
-                          fontWeight: FontWeight.bold,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          joke['category'],
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: textColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    Icon(
-                      Icons.emoji_emotions_outlined,
-                      color: primaryColor.withOpacity(0.5),
-                      size: 20,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (isTwoPartJoke) ...[
-                  Text(
-                    joke['setup'] ?? '',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: textColor,
-                      fontWeight: FontWeight.w600,
-                      height: 1.5,
-                    ),
+                      const Spacer(),
+                      Icon(
+                        Icons.emoji_emotions_outlined,
+                        color: textColor.withOpacity(0.7),
+                        size: 20,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    joke['delivery'] ?? '',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: textColor.withOpacity(0.8),
-                      fontStyle: FontStyle.italic,
-                      height: 1.5,
+                  const SizedBox(height: 16),
+                  if (isTwoPartJoke) ...[
+                    Text(
+                      joke['setup'] ?? '',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: textColor,
+                        fontWeight: FontWeight.w600,
+                        height: 1.5,
+                      ),
                     ),
-                  ),
-                ] else
-                  Text(
-                    joke['joke'] ?? '',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: textColor,
-                      height: 1.5,
+                    const SizedBox(height: 12),
+                    Text(
+                      joke['delivery'] ?? '',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: secondaryTextColor,
+                        fontStyle: FontStyle.italic,
+                        height: 1.5,
+                      ),
                     ),
-                  ),
-              ],
+                  ] else
+                    Text(
+                      joke['joke'] ?? '',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: textColor,
+                        height: 1.5,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -201,7 +204,7 @@ class _JokeListPageState extends State<JokeListPage>
             'Tap the button below for a dose of humor!',
             style: TextStyle(
               fontSize: 16,
-              color: textColor.withOpacity(0.7),
+              color: secondaryTextColor,
               height: 1.5,
             ),
             textAlign: TextAlign.center,
@@ -222,12 +225,13 @@ class _JokeListPageState extends State<JokeListPage>
           child: ElevatedButton(
             onPressed: _isLoading ? null : _fetchJokes,
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
+              backgroundColor: Colors.white.withOpacity(0.2),
               foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 24),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.white.withOpacity(0.2)),
               ),
             ),
             child: Row(
@@ -250,7 +254,6 @@ class _JokeListPageState extends State<JokeListPage>
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
                     ),
                   ),
                 ],
@@ -270,7 +273,7 @@ class _JokeListPageState extends State<JokeListPage>
           Icon(
             Icons.sentiment_very_satisfied_rounded,
             size: 64,
-            color: primaryColor.withOpacity(0.5),
+            color: textColor.withOpacity(0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -286,7 +289,7 @@ class _JokeListPageState extends State<JokeListPage>
             'Tap the button above to fetch some jokes!',
             style: TextStyle(
               fontSize: 16,
-              color: textColor.withOpacity(0.7),
+              color: secondaryTextColor,
             ),
           ),
         ],
@@ -297,43 +300,55 @@ class _JokeListPageState extends State<JokeListPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildHeader(),
-                      _buildFetchButton(),
-                      const SizedBox(height: 24),
-                    ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              gradientStart,
+              gradientMiddle,
+              gradientEnd,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildHeader(),
+                    _buildFetchButton(),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+              if (_jokesRaw.isEmpty && !_isLoading)
+                SliverFillRemaining(
+                  child: _buildEmptyState(),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (_isLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        );
+                      }
+                      return _buildJokeCard(_jokesRaw[index], index);
+                    },
+                    childCount: _isLoading ? 1 : _jokesRaw.length,
                   ),
                 ),
-                if (_jokesRaw.isEmpty && !_isLoading)
-                  SliverFillRemaining(
-                    child: _buildEmptyState(),
-                  )
-                else
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        if (_isLoading) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        return _buildJokeCard(_jokesRaw[index], index);
-                      },
-                      childCount: _isLoading ? 1 : _jokesRaw.length,
-                    ),
-                  ),
-              ],
-            );
-          },
+            ],
+          ),
         ),
       ),
     );
