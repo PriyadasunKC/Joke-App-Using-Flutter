@@ -17,15 +17,11 @@ The Joke App is a Flutter-based mobile application that fetches and displays pro
 ## Configuration and Setup
 
 ### Prerequisites
-- Flutter SDK (version 3.0 or higher)
-- Dart SDK (version 2.17 or higher)
+- Flutter SDK (version: 3.24.3 or higher)
+- Dart SDK (version 3.5.3 or higher)
 - Android Studio or VS Code with Flutter extensions
 - A physical device or emulator for testing
 
-### Installation Steps
-1. Clone the repository:
-  ```bash
-  git clone https://github.com/yourusername/joke_app.git
 
 
 
@@ -35,3 +31,19 @@ The Joke App is a Flutter-based mobile application that fetches and displays pro
 ![Image description](images/1.jpg)
 ![Image description](images/2.jpg)
 ![Image description](images/3.jpg)
+## Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/joke_app.git 
+
+
+## Running Tests
+
+To run tests, run the following command
+
+```bash
+  cd joke_app
+  flutter pub get
+  flutter run
+```
+
