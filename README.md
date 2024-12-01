@@ -1,18 +1,14 @@
-# hello_flutter_app
 
-A new Flutter project.
+# Joke App
 
-## Getting Started
+The Joke App is a Flutter-based mobile application that fetches and displays programming and Christmas-themed jokes from the JokeAPI. It features a modern, responsive UI with animated cards and a clean design. Users can tap a button to fetch new jokes, which are displayed in an easy-to-read format with support for both single-line and two-part jokes. The app uses Material Design 3 principles and handles both success and error states gracefully.
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# flutter_app
-creating first flutter app
+
+## Screenshots
+
+![Image description](images/1.jpg)
+![Image description](images/2.jpg)
+![Image description](images/3.jpg)
