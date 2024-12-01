@@ -42,7 +42,7 @@ The Joke App is a Flutter-based mobile application that fetches and displays pro
 To run tests, run the following command
 
 ```bash
-  cd joke_app
+  cd Joke-App-Using-Flutter
   flutter pub get
   flutter run
 ```
