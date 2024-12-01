@@ -38,12 +38,10 @@ class _JokeListPageState extends State<JokeListPage>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
-  // Modern gradient colors
   final Color gradientStart = const Color(0xFF6B8DE3);
   final Color gradientMiddle = const Color(0xFF8B5CF6);
   final Color gradientEnd = const Color(0xFFDB2777);
 
-  // Updated component colors
   final Color primaryColor = const Color(0xFF8B5CF6);
   final Color cardBackground = Colors.white.withOpacity(0.20);
   final Color textColor = Colors.white;
