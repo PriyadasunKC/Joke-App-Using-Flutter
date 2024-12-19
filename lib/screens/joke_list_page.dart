@@ -46,13 +46,16 @@ class _JokeListPageState extends State<JokeListPage>
 
   Future<void> _initializeData() async {
     final isConnected = await _connectivityService.isConnected();
-    setState(() => _isOffline = !isConnected);
+    setState(() {
+      _isOffline = !isConnected;
+      _showOfflineBanner = !isConnected;
+    });
     await _loadJokes();
   }
 
   void _setupConnectivityStream() {
-    _connectivityService.connectivityStream.listen((status) {
-      _handleConnectivityChange(status);
+    _connectivityService.connectivityStream.listen((status) async {
+      await _handleConnectivityChange(status);
     });
   }
 
@@ -74,11 +77,48 @@ class _JokeListPageState extends State<JokeListPage>
         _showOfflineBanner = true;
       });
     } else if (isConnected && _isOffline) {
+      try {
+        await _loadJokes(forceRefresh: true);
+        if (mounted) {
+          setState(() {
+            _isOffline = false;
+            _showOfflineBanner = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _showOfflineBanner = true;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _checkConnectivityAndLoadJokes() async {
+    final isConnected = await _connectivityService.isConnected();
+    if (!isConnected) {
       setState(() {
-        _isOffline = false;
-        _showOfflineBanner = false;
+        _isOffline = true;
+        _showOfflineBanner = true;
       });
+      return;
+    }
+
+    try {
       await _loadJokes(forceRefresh: true);
+      if (mounted) {
+        setState(() {
+          _isOffline = false;
+          _showOfflineBanner = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _showOfflineBanner = true;
+        });
+      }
     }
   }
 
@@ -88,17 +128,21 @@ class _JokeListPageState extends State<JokeListPage>
     setState(() => _isLoading = true);
     try {
       final jokes = await _jokeService.fetchJokes(forceRefresh: forceRefresh);
-      setState(() {
-        _jokes = jokes;
-        _isLoading = false;
-      });
-      _animationController.reset();
-      _animationController.forward();
+      if (mounted) {
+        setState(() {
+          _jokes = jokes;
+          _isLoading = false;
+        });
+        _animationController.reset();
+        _animationController.forward();
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _showOfflineBanner = true;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _showOfflineBanner = true;
+        });
+      }
     }
   }
 
@@ -243,7 +287,7 @@ class _JokeListPageState extends State<JokeListPage>
         width: double.infinity,
         height: 56,
         child: ElevatedButton(
-          onPressed: _isLoading ? null : () => _loadJokes(forceRefresh: true),
+          onPressed: _isLoading ? null : _checkConnectivityAndLoadJokes,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppTheme.lightColorScheme.primary,
             foregroundColor: AppTheme.lightColorScheme.onPrimary,
@@ -329,49 +373,55 @@ class _JokeListPageState extends State<JokeListPage>
           ConnectionBanner(
             isOffline: _showOfflineBanner,
             onDismiss: () => setState(() => _showOfflineBanner = false),
+            onRetry: _checkConnectivityAndLoadJokes,
           ),
           Expanded(
-            child: Container(
-              color: AppTheme.lavenderSurfaces['surface1'],
-              child: SafeArea(
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildHeader(),
-                          _buildFetchButton(),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
+            child: Stack(
+              children: [
+                Container(
+                  color: AppTheme.lavenderSurfaces['surface1'],
+                  child: SafeArea(
+                    child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildHeader(),
+                              _buildFetchButton(),
+                              const SizedBox(height: 24),
+                            ],
+                          ),
+                        ),
+                        if (_jokes.isEmpty && !_isLoading)
+                          SliverFillRemaining(
+                            child: _buildEmptyState(),
+                          )
+                        else
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) =>
+                                  _buildJokeCard(_jokes[index], index),
+                              childCount: _jokes.length,
+                            ),
+                          ),
+                      ],
                     ),
-                    if (_jokes.isEmpty && !_isLoading)
-                      SliverFillRemaining(
-                        child: _buildEmptyState(),
-                      )
-                    else
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            if (_isLoading) {
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    AppTheme.lightColorScheme.primary,
-                                  ),
-                                ),
-                              );
-                            }
-                            return _buildJokeCard(_jokes[index], index);
-                          },
-                          childCount: _isLoading ? 1 : _jokes.length,
+                  ),
+                ),
+                if (_isLoading)
+                  Container(
+                    color: Colors.black.withOpacity(0.1),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppTheme.lightColorScheme.primary,
                         ),
                       ),
-                  ],
-                ),
-              ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
