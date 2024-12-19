@@ -83,13 +83,6 @@ The app follows a clean architecture pattern with the following components:
 ![App Screenshot 2](images/2.jpg)
 ![App Screenshot 3](images/3.jpg)
 
-## Running Tests
-
-Execute the following commands to run tests:
-
-```bash
-flutter test
-```
 
 ## Error Handling
 
